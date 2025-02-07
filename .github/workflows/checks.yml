@@ -1,0 +1,22 @@
+# performs checks on the code
+---
+name: Checks # name of the workflow as it appears in the Github Actions tab
+
+on: [push] # when to run the workflow, in this case when a push is made to the repository
+
+jobs: # jobs to run in the workflow
+  test-lint:
+    name: Test and Lint # name of the job
+    runs-on: ubuntu-20.04 # the operating system to run the job on
+    steps: # steps to run in the job
+      - name: Login to Docker Hub
+        uses: docker/login-action@v1 # action to login to Docker Hub
+        with:
+          username: ${{ secrets.DOCKERHUB_USER }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Test
+        run: docker compose run --rm app sh -c "python manage.py test"
+      - name: Lint
+        run: docker compose run --rm app sh -c "flake8"
